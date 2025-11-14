@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "katex/dist/katex.min.css";
 
 :root {
   --background: #ffffff;
@@ -6,6 +7,7 @@
   --hero-bg: #0a0a0a;
   --hero-pattern-light: #ffffff;
   --hero-pattern-accent: #60a5fa;
+  --button-blue: rgb(17, 109, 255);
 }
 
 @theme inline {
@@ -14,12 +16,147 @@
   --color-hero-bg: var(--hero-bg);
   --color-hero-pattern-light: var(--hero-pattern-light);
   --color-hero-pattern-accent: var(--hero-pattern-accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-button-blue: var(--button-blue);
+  --font-space-grotesk: var(--font-space-grotesk);
+  --font-inter: var(--font-inter);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  line-height: 22.4px;
+  font-weight: 400;
+}
+
+/* Typography Classes */
+.font-heading {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 400;
+}
+
+.font-body {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 300;
+}
+
+.font-subtitle {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.font-h3 {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 600;
+}
+
+/* H1 Hero Style */
+.text-hero-h1 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 41.65px;
+  font-weight: 400;
+  line-height: 49.98px;
+  color: rgb(255, 255, 255);
+}
+
+@media (max-width: 768px) {
+  .text-hero-h1 {
+    font-size: 32px;
+    line-height: 38px;
+  }
+  
+  .text-subtitle {
+    font-size: 14px;
+    line-height: 18px;
+  }
+}
+
+/* H2 Style */
+.text-h2 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 24.34px;
+  font-weight: 400;
+  line-height: 31.64px;
+  color: rgb(0, 0, 0);
+}
+
+/* H3 Style */
+.text-h3 {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20.8px;
+  color: rgb(0, 0, 0);
+}
+
+/* H5 Subtitle Style */
+.text-subtitle {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 15.17px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 19.73px;
+  color: rgb(255, 255, 255);
+}
+
+/* Body Text Style */
+.text-body {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 22.4px;
+  color: rgb(0, 0, 0);
+}
+
+/* Button Style */
+.btn-primary {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 0px 24px;
+  min-height: 36px;
+  border-radius: 24px;
+  border: none;
+  background-color: rgb(255, 255, 255);
+  color: rgb(17, 109, 255);
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* KaTeX Math Rendering Styles */
+.katex {
+  font-size: 1.1em;
+  color: rgb(0, 0, 0);
+}
+
+.katex-display {
+  margin: 1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.katex-display > .katex {
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  text-align: initial;
+}
+
+/* Ensure math equations are readable */
+.markdown-content .katex {
+  font-family: KaTeX_Main, "Times New Roman", serif;
 }

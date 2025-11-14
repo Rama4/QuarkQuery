@@ -8,6 +8,7 @@ import {
   ArrowRightIcon,
 } from "./components/icons";
 import { StatusPanel } from "./components/StatusPanel";
+import { MarkdownRenderer } from "./components/MarkdownRenderer";
 
 interface Source {
   arxiv_id: string;
@@ -84,11 +85,11 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 py-24">
-          <h1 className="text-6xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-hero-h1 mb-4">
             QuarkQuery
           </h1>
           <div className="flex items-center gap-2">
-            <p className="text-description md:text-xl text-white italic">
+            <p className="text-subtitle">
               RAG for answering questions related to theoretical physics
             </p>
           </div>
@@ -108,17 +109,17 @@ export default function Home() {
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   placeholder="Ask a question about physics..."
-                  className="w-full pl-12 pr-32 py-4 rounded-xl border border-gray-300 focus:border-black focus:ring-2 focus:ring-gray-200 outline-none transition-all text-black placeholder:text-gray-400 bg-white shadow-sm"
+                  className="text-body w-full pl-12 pr-32 py-4 rounded-xl border border-gray-300 focus:border-black focus:ring-2 focus:ring-gray-200 outline-none transition-all text-black placeholder:text-gray-400 bg-white shadow-sm"
                   disabled={loading}
                 />
                 <button
                   type="submit"
                   disabled={loading || !question.trim()}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
+                  className="btn-primary absolute right-2 top-1/2 -translate-y-1/2 gap-2"
                 >
                   {loading ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                       <span>Searching...</span>
                     </>
                   ) : (
@@ -134,7 +135,7 @@ export default function Home() {
             {/* Example Questions */}
             {!response && (
               <div className="mt-6">
-                <p className="text-sm text-gray-600 mb-3 font-medium">
+                <p className="text-body text-sm mb-3 font-medium opacity-70">
                   Try these examples:
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -142,7 +143,7 @@ export default function Home() {
                     <button
                       key={idx}
                       onClick={() => handleExampleClick(example)}
-                      className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-black hover:border-black hover:bg-gray-50 transition-all"
+                      className="btn-primary text-body"
                     >
                       {example}
                     </button>
@@ -168,17 +169,15 @@ export default function Home() {
               {/* Answer */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center shrink-0">
                     <SparklesIcon className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-black mb-2">
+                    <h2 className="text-h3 mb-2">
                       Answer
                     </h2>
                     <div className="prose prose-slate max-w-none">
-                      <p className="text-black leading-relaxed whitespace-pre-wrap">
-                        {response.answer}
-                      </p>
+                      <MarkdownRenderer content={response.answer} />
                     </div>
                   </div>
                 </div>
@@ -188,7 +187,7 @@ export default function Home() {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpenIcon className="w-5 h-5 text-black" />
-                  <h2 className="text-lg font-semibold text-black">
+                  <h2 className="text-h3">
                     Sources ({response.sources.length})
                   </h2>
                 </div>
@@ -200,18 +199,18 @@ export default function Home() {
                     >
                       <div className="flex items-start justify-between gap-4 mb-2">
                         <div className="flex-1">
-                          <h3 className="font-medium text-black mb-1">
+                          <h3 className="text-h3 mb-1">
                             {source.title}
                           </h3>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-body text-xs opacity-70">
                             arXiv: {source.arxiv_id} • Relevance:{" "}
                             {(source.score * 100).toFixed(1)}%
                           </p>
                         </div>
                       </div>
-                      <p className="text-sm text-black leading-relaxed">
-                        {source.text}
-                      </p>
+                      <div className="text-body text-sm">
+                        <MarkdownRenderer content={source.text} />
+                      </div>
                     </div>
                   ))}
                 </div>
