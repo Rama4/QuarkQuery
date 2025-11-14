@@ -1,0 +1,14 @@
+{
+  "env": {
+    "PINECONE_API_KEY": "@pinecone_api_key",
+    "GROQ_API_KEY": "@groq_api_key",
+    "HUGGINGFACE_API_KEY": "@huggingface_api_key"
+  },
+  "functions": {
+    "app/api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
+}
+
