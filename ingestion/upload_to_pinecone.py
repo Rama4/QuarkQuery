@@ -13,26 +13,60 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Environment variable names
+ENV_PINECONE_API_KEY = "PINECONE_API_KEY"
+ENV_PINECONE_INDEX = "PINECONE_INDEX"
+
+# Configuration constants
+DEFAULT_INDEX_NAME = "physics-rag"  # Default index name if not set in env
+PINECONE_INDEX_NAME = os.getenv(ENV_PINECONE_INDEX) or DEFAULT_INDEX_NAME
+EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_EMBEDDING_DIMENSION = 384
+DEFAULT_METRIC = "cosine"
+PINECONE_CLOUD = "aws"
+PINECONE_REGION = "us-east-1"
+DEFAULT_BATCH_SIZE = 100
+DEFAULT_TOP_K = 3
+TEXT_METADATA_LIMIT = 1000
+TITLE_METADATA_LIMIT = 200
+
+# File paths
+EXTRACTED_DATA_DIR = "extracted_data"
+CHUNKS_WITH_EMBEDDINGS_FILE = "chunks_with_embeddings.json"
 
 class PineconeUploader:
-    def __init__(self, index_name: str = "physics-rag"):
+    def __init__(self, index_name: str = None):
         """
         Initialize Pinecone client and create/connect to index
-        """
+        
+        Args:
+            index_name: Name of the Pinecone index (defaults to PINECONE_INDEX env var or DEFAULT_INDEX_NAME)
+        """            
         # Get API key from environment
-        api_key = os.getenv("PINECONE_API_KEY")
+        api_key = os.getenv(ENV_PINECONE_API_KEY)
         if not api_key:
             raise ValueError(
-                "PINECONE_API_KEY not found in environment variables.\n"
-                "Please create a .env file with: PINECONE_API_KEY=your_key_here"
+                f"{ENV_PINECONE_API_KEY} not found in environment variables.\n"
+                f"Please create a .env file with: {ENV_PINECONE_API_KEY}=your_key_here"
+            )
+        
+        # Use provided index_name, or fall back to env var, or use default
+        if index_name is None:
+            index_name = os.getenv(ENV_PINECONE_INDEX) or DEFAULT_INDEX_NAME
+        
+        if not index_name or index_name.strip() == "":
+            raise ValueError(
+                f"{ENV_PINECONE_INDEX} not found in environment variables.\n"
+                f"Please set it in your .env file: {ENV_PINECONE_INDEX}=your_index_name\n"
+                f"Or it will default to: {DEFAULT_INDEX_NAME}"
             )
         
         print("Initializing Pinecone...")
         self.pc = Pinecone(api_key=api_key)
-        self.index_name = index_name
+        self.index_name = index_name.strip()
         self.index = None
         
-    def create_index(self, dimension: int = 384, metric: str = "cosine"):
+    def create_index(self, dimension: int = DEFAULT_EMBEDDING_DIMENSION, metric: str = DEFAULT_METRIC):
         """
         Create Pinecone index if it doesn't exist
         """
@@ -49,8 +83,8 @@ class PineconeUploader:
                 dimension=dimension,
                 metric=metric,
                 spec=ServerlessSpec(
-                    cloud="aws",
-                    region="us-east-1"
+                    cloud=PINECONE_CLOUD,
+                    region=PINECONE_REGION
                 )
             )
             print(f"✓ Index '{self.index_name}' created successfully!")
@@ -77,10 +111,10 @@ class PineconeUploader:
             
             # Prepare metadata (Pinecone has size limits, so be selective)
             metadata = {
-                "text": chunk["text"][:1000],  # Limit text size
+                "text": chunk["text"][:TEXT_METADATA_LIMIT],  # Limit text size
                 "arxiv_id": chunk["metadata"]["arxiv_id"],
                 "filename": chunk["metadata"]["filename"],
-                "title": chunk["metadata"]["title"][:200],  # Limit title size
+                "title": chunk["metadata"]["title"][:TITLE_METADATA_LIMIT],  # Limit title size
                 "chunk_index": chunk["metadata"]["chunk_index"],
                 "num_pages": chunk["metadata"]["num_pages"]
             }
@@ -89,7 +123,7 @@ class PineconeUploader:
         
         return vectors
     
-    def upload_vectors(self, vectors: List[tuple], batch_size: int = 100):
+    def upload_vectors(self, vectors: List[tuple], batch_size: int = DEFAULT_BATCH_SIZE):
         """
         Upload vectors to Pinecone in batches
         """
@@ -115,13 +149,13 @@ class PineconeUploader:
         print(f"\nTesting query: '{query_text}'")
         
         # Generate embedding for query
-        model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        model = SentenceTransformer(EMBEDDING_MODEL_NAME)
         query_embedding = model.encode(query_text).tolist()
         
         # Query Pinecone
         results = self.index.query(
             vector=query_embedding,
-            top_k=3,
+            top_k=DEFAULT_TOP_K,
             include_metadata=True
         )
         
@@ -140,7 +174,7 @@ def main():
     print()
     
     # Load chunks with embeddings
-    chunks_file = Path("extracted_data") / "chunks_with_embeddings.json"
+    chunks_file = Path(EXTRACTED_DATA_DIR) / CHUNKS_WITH_EMBEDDINGS_FILE
     
     if not chunks_file.exists():
         print(f"Error: {chunks_file} not found!")
@@ -160,7 +194,15 @@ def main():
     print()
     
     # Initialize Pinecone
-    uploader = PineconeUploader(index_name="physics-rag")
+    # Use environment variable or default index name
+    index_name = os.getenv(ENV_PINECONE_INDEX) or DEFAULT_INDEX_NAME
+    
+    if index_name == DEFAULT_INDEX_NAME and not os.getenv(ENV_PINECONE_INDEX):
+        print(f"⚠ Using default index name: '{index_name}'")
+        print(f"  To use a custom name, set {ENV_PINECONE_INDEX} in your .env file")
+        print()
+    
+    uploader = PineconeUploader(index_name=index_name)
     
     # Create index
     uploader.create_index(dimension=embedding_dim)
