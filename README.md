@@ -2,6 +2,8 @@
 
 An AI-powered RAG (Retrieval Augmented Generation) application that lets you ask questions about physics and get intelligent answers from a curated database of foundational physics research papers.
 
+<img width="1920" height="1080" alt="Screenshot 2025-11-14 124415" src="https://github.com/user-attachments/assets/b5032be6-d314-4582-8cb2-55faf7b9565b" />
+
 ## ✨ Features
 
 - 🔍 **Semantic Search** across 100 foundational physics papers
