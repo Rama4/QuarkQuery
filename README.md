@@ -4,17 +4,19 @@ An AI-powered RAG (Retrieval Augmented Generation) application that lets you ask
 
 ## ✨ Features
 
-- 🔍 **Semantic Search** across 11 foundational physics papers
+- 🔍 **Semantic Search** across 100 foundational physics papers
 - 🤖 **AI-Powered Answers** using Groq's Llama 3.3 70B
 - 📚 **Source Citations** with relevance scores
 - 🎨 **Beautiful UI** built with Next.js and Tailwind CSS
 - 📊 **API Status Dashboard** - Monitor service health and rate limits
 - 🆓 **100% Free** hosting on Vercel with free tier APIs
 - ⚡ **Fast** - 2-4 second query response times
+- 🚀 **GPU-Accelerated** embeddings (10-50x faster with CUDA)
+- ⚙️ **Parallel Processing** for fast data ingestion
 
 ## 🎯 Try It Live
 
-**[Demo Link Coming Soon]**
+[https://quark-query.vercel.app/](https://quark-query.vercel.app/)
 
 ### Example Questions
 
@@ -26,20 +28,30 @@ An AI-powered RAG (Retrieval Augmented Generation) application that lets you ask
 
 ### Features in Action
 
-- 🔍 **Search** - Semantic search finds relevant passages across all 11 papers
+- 🔍 **Search** - Semantic search finds relevant passages across all 100 papers
 - 🤖 **Answer** - AI generates comprehensive explanations
 - 📚 **Citations** - See exact sources with relevance scores
 - 📊 **Status** - Click "API Status" button to monitor service health
 
 ## 📚 Included Papers
 
-11 foundational physics papers including:
+**100 foundational physics papers** covering:
+
+- **String Theory & M-theory** - Polchinski's D-branes, Witten's M-theory unification
+- **AdS/CFT & Holography** - Maldacena's original correspondence, holographic entanglement
+- **Extra Dimensions** - Randall-Sundrum models, large extra dimensions
+- **Swampland Program** - Distance conjecture, de Sitter swampland
+- **Black Holes** - Information paradox, microstate counting, Page curve
+- **Quantum Information** - Holographic error correction, entanglement wedge reconstruction
+
+Key papers include:
 
 - **Maldacena (1997)** - The Large N Limit and AdS/CFT
 - **Witten (1998)** - Anti de Sitter Space and Holography
 - **KKLT (2003)** - de Sitter Vacua in String Theory
 - **Randall-Sundrum** - Large Mass Hierarchy from Extra Dimensions
-- And 7 more seminal papers (532 total pages)
+- **Strominger-Vafa (1996)** - Black hole microstate counting
+- And 95 more foundational papers
 
 ## 🛠️ Tech Stack
 
@@ -67,7 +79,7 @@ An AI-powered RAG (Retrieval Augmented Generation) application that lets you ask
 
 ```bash
 git clone <your-repo>
-cd "AI Phyics RAG"
+cd "QuarkQuery"
 
 # Install frontend dependencies
 cd frontend
@@ -78,15 +90,24 @@ cd ../ingestion
 pip install -r requirements.txt
 ```
 
-### 2. Extract & Process Papers
+### 2. Download Papers (if not already downloaded)
 
 ```bash
 cd ingestion
 
-# Step 1: Extract text from PDFs
+# Download 100 papers from arXiv (parallel processing)
+python download_papers.py --yes
+```
+
+### 3. Extract & Process Papers
+
+```bash
+cd ingestion
+
+# Step 1: Extract text from PDFs (parallel processing)
 python extract_pdfs.py
 
-# Step 2: Chunk and generate embeddings
+# Step 2: Chunk text and generate embeddings (GPU-accelerated if available)
 python chunk_and_embed.py
 
 # Step 3: Upload to Pinecone (requires API key)
@@ -94,7 +115,13 @@ python chunk_and_embed.py
 python upload_to_pinecone.py
 ```
 
-### 3. Run Frontend
+**Note:** The scripts automatically detect and use GPU if available. For GPU support, install PyTorch with CUDA:
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+### 4. Run Frontend
 
 ```bash
 cd ../frontend
@@ -114,9 +141,12 @@ Visit http://localhost:3000 🎉
 ```
 .
 ├── ingestion/                # Data processing pipeline
-│   ├── extract_pdfs.py      # PDF → JSON extraction
-│   ├── chunk_and_embed.py   # Text → Embeddings
+│   ├── download_papers.py   # Download PDFs from arXiv (parallel)
+│   ├── extract_pdfs.py      # PDF → JSON extraction (parallel)
+│   ├── chunk_and_embed.py   # Text → Embeddings (GPU-accelerated)
 │   ├── upload_to_pinecone.py # Upload to vector DB
+│   ├── pending_papers.json  # List of 100 papers to download
+│   ├── data/                # Downloaded PDFs
 │   └── extracted_data/      # Generated JSON files
 ├── frontend/                 # Next.js application
 │   ├── app/
@@ -154,6 +184,7 @@ HUGGINGFACE_API_KEY=your_huggingface_api_key
 
 ```bash
 PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX=physics-rag  # Optional: defaults to "physics-rag" if not set
 ```
 
 **Where to get API keys (all FREE):**
